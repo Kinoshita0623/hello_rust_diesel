@@ -3,10 +3,10 @@ extern crate diesel;
 use diesel::sqlite::SqliteConnection;
 use diesel::prelude::*;
 pub mod schema;
-use schema::posts;
-mod models;
+pub mod models;
+pub mod dao;
 use models::NewPost;
-use models::Post;
+use dao::*;
 
 
 fn main() {
@@ -14,24 +14,24 @@ fn main() {
     let database_url = "sample.db";
     
     let connection = SqliteConnection::establish(database_url).expect("SQLite connection error");
-    let result = diesel::insert_into(posts::table)
-        .values(NewPost{
-            title: "hogehoge",
-            body: "piyopiyo"
-        })
-        .execute(&connection)
-        .expect("SQLite insert error");
-    println!("result:{}", result);
+    let post_dao = PostDAO {
+        connection: connection
+    };
 
-    print_posts(&connection);
+    let result = post_dao.create(NewPost{
+        title: "hogehoge",
+        body: "Piyopiyo"
+    });
+    println!("result id:{}", result);
+
+    //let created = post_dao.findOne(result)
+    print_posts(&post_dao);
 }
 
 
-fn print_posts(connection: &SqliteConnection) {
+fn print_posts(post_dao: &PostDAO) {
     //use schema::posts::dsl::*;
-    let results = posts::dsl::posts
-    .load::<Post>(connection)
-    .expect("Error loading posts");
+    let results = post_dao.find_all();
 
     for post in results {
         println!("id:{}, title:{}, body:{}", post.id, post.title, post.body);
