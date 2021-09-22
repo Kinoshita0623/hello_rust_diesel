@@ -9,25 +9,25 @@ use std::vec::Vec;
 
 //use models::Post;
 
-pub struct PostDAO{
-    pub connection: SqliteConnection
+pub struct PostDAO<'a>{
+    pub connection: &'a SqliteConnection
 }
 
 
-impl PostDAO{
+impl<'a> PostDAO<'a>{
 
     pub fn create(&self, new_post: NewPost) -> usize {
         return diesel::insert_into(posts::table)
             .values(new_post)
-            .execute(&self.connection)
+            .execute(self.connection)
             .expect("作成に失敗");
     }
 
     pub fn find_all(&self) -> Vec<Post> {
-        return posts::dsl::posts.load::<Post>(&self.connection).expect("取得に失敗");
+        return posts::dsl::posts.load::<Post>(self.connection).expect("取得に失敗");
     }
 
     pub fn find_one(&self, id: i32) -> Post {
-        return posts::dsl::posts.filter(posts::id.eq(id)).first::<Post>(&self.connection).expect("取得に失敗");
+        return posts::dsl::posts.filter(posts::id.eq(id)).first::<Post>(self.connection).expect("取得に失敗");
     }
 }
