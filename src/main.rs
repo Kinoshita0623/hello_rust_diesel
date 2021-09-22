@@ -4,20 +4,10 @@ use diesel::sqlite::SqliteConnection;
 use diesel::prelude::*;
 pub mod schema;
 use schema::posts;
+mod models;
+use models::NewPost;
+use models::Post;
 
-#[derive(Queryable)]
-struct Post {
-    pub id: i32,
-    pub title: String,
-    pub body: String
-}
-
-#[derive(Insertable)]
-#[table_name = "posts"]
-struct NewPost<'a> {
-    pub title: &'a str,
-    pub body: &'a str,
-}
 
 fn main() {
 
