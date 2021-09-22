@@ -38,9 +38,8 @@ fn main() {
 
 
 fn print_posts(connection: &SqliteConnection) {
-    use schema::posts::dsl::*;
-    let results = posts
-    .limit(5)
+    //use schema::posts::dsl::*;
+    let results = posts::dsl::posts
     .load::<Post>(connection)
     .expect("Error loading posts");
 
