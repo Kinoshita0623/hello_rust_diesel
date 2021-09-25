@@ -7,6 +7,8 @@ pub mod models;
 pub mod dao;
 use models::NewPost;
 use dao::*;
+pub mod repositories;
+use repositories::*;
 use std::io;
 
 
@@ -20,6 +22,10 @@ fn main() {
     };
 
    
+    show_post_console(post_dao);
+}
+
+fn show_post_console<T>(post_repository: T) where T: PostRepository{
     loop {
         println!("操作を選択 1: 作成, 2: 検索, 3: 全表示, 4: 削除 ,5: 終了");
 
@@ -43,7 +49,7 @@ fn main() {
                 let body = &body[..(body.len() - 1)];
             
                     
-                let result = post_dao.create(NewPost{
+                let result = post_repository.create(NewPost{
                     title: title,
                     body: body
                 });
@@ -54,17 +60,17 @@ fn main() {
                 let mut id = String::new();
                 io::stdin().read_line(&mut id).expect("error");
                 
-                let result = post_dao.find_one(id.trim().parse().expect("error"));
+                let result = post_repository.find_one(id.trim().parse().expect("error"));
                 println!("id:{}, titile:{}, body:{}", result.id, result.title, result.body);
             },  
             3 => {
-                print_posts(&post_dao);
+                print_posts(&post_repository);
             },
             4 => {
                 println!("削除番号を入力");
                 let mut id = String::new();
                 io::stdin().read_line(&mut id).expect("Input error");
-                let result = post_dao.delete(id.trim().parse().expect("Input format error"));
+                let result = post_repository.delete(id.trim().parse().expect("Input format error"));
                 match result {
                     Ok(_) => println!("削除成功"),
                     Err(e) => println!("削除に失敗しました:{:?}", e),
@@ -79,15 +85,9 @@ fn main() {
             }
         }
     }
- 
-
-
-
-    //let created = post_dao.findOne(result)
 }
 
-
-fn print_posts(post_dao: &PostDAO) {
+fn print_posts<T>(post_dao: &T) where T: PostRepository{
     //use schema::posts::dsl::*;
     let results = post_dao.find_all();
 
