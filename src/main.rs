@@ -21,7 +21,7 @@ fn main() {
 
    
     loop {
-        println!("操作を選択 1: 作成, 2: 検索, 3: 全表示, 4: 終了");
+        println!("操作を選択 1: 作成, 2: 検索, 3: 全表示, 4: 削除 ,5: 終了");
 
         let mut action = String::new();
         io::stdin().read_line(&mut action)
@@ -61,6 +61,17 @@ fn main() {
                 print_posts(&post_dao);
             },
             4 => {
+                println!("削除番号を入力");
+                let mut id = String::new();
+                io::stdin().read_line(&mut id).expect("Input error");
+                let result = post_dao.delete(id.trim().parse().expect("Input format error"));
+                match result {
+                    Ok(_) => println!("削除成功"),
+                    Err(e) => println!("削除に失敗しました:{:?}", e),
+                };
+
+            },
+            5 => {
                 break;
             },
             _ => {
