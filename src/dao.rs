@@ -7,6 +7,7 @@ use diesel::prelude::*;
 use diesel::sqlite::SqliteConnection;
 use std::vec::Vec;
 use crate::repositories::*;
+use diesel::dsl::sql;
 //use models::Post;
 
 pub struct PostDAO<'a>{
@@ -24,6 +25,15 @@ impl<'a> PostRepository for PostDAO<'a>{
     }
 
     fn find_all(&self) -> Vec<Post> {
+
+        // where inのサンプル
+        //return posts::dsl::posts.filter(posts::id.eq_any([5, 6, 7])).load::<Post>(self.connection).expect("取得失敗");
+        
+        // where inのサンプル（サブクエリバージョン)
+        //return posts::dsl::posts.filter(posts::id.eq_any(posts::dsl::posts.select(posts::id))).load::<Post>(self.connection).expect("取得失敗");
+
+        // filter部分にSQLを使用する例
+        //return posts::dsl::posts.filter(sql("id in(7,8,9,10)")).load::<Post>(self.connection).expect("取得に失敗");
         return posts::dsl::posts.load::<Post>(self.connection).expect("取得に失敗");
     }
 
